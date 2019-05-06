@@ -12,14 +12,15 @@
     <AsAction>False</AsAction>
     <FastCombine>False</FastCombine>
     <ClearLog>False</ClearLog>
-    <ShowEngineTraces>False</ShowEngineTraces>
-    <ShowUserTraces>False</ShowUserTraces>
+    <ShowEngineTraces>True</ShowEngineTraces>
+    <ShowUserTraces>True</ShowUserTraces>
     <LegacyRedirects>False</LegacyRedirects>
     <SuppressRowErrors>False</SuppressRowErrors>
     <SuppressCellErrors>False</SuppressCellErrors>
     <MaxRows>1000</MaxRows>
     <ExtensionProject>Yes</ExtensionProject>
     <Name>eStatGoJpConnector</Name>
+    <ThrowOnFoldingFailure>True</ThrowOnFoldingFailure>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>false</DebugSymbols>
@@ -64,15 +65,12 @@
     <Compile Include="eStatGoJpConnector80.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="resources.en.resx">
+    <Compile Include="resources.resx">
       <SubType>Code</SubType>
     </Compile>
     <Content Include="eStatGoJpConnector.query.pq">
       <SubType>Code</SubType>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="BuildExtension" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll">

@@ -1,10 +1,36 @@
-﻿section eStatGoJpConnector;
+﻿// This file contains your Data Connector logic
+section eStatGoJpConnector;
 
 [DataSource.Kind="eStatGoJpConnector", Publish="eStatGoJpConnector.Publish"]
-shared eStatGoJpConnector.Nav = Value.ReplaceType(eStatGoJpConnectorNavImpl, eStatGoJpConnectorNavType);
+shared eStatGoJpConnector.Contents = Value.ReplaceType(eStatGoJpConnectorImpl, eStatGoJpConnectorType);
 
-eStatGoJpConnectorNavType = type function (
-    searchKind as (type text meta [
+
+eStatGoJpConnectorImpl = (optional searchKind as text, optional lang as text)=>
+    let
+        credentials = Extension.CurrentCredential(),
+        apiKey = credentials[Password],
+        _lang = if (lang <> null) then Text.At(lang, 0) else "J",
+        _searchKind = if (searchKind <> null) then searchKind else Text.From("1: 統計情報"),
+        _url = "https://api.e-stat.go.jp/rest/2.1/app/json/getStatsList?appId=" & apiKey & "&statsNameList=Y&searchKind=" & Text.At(_searchKind, 0),
+        _response = Web.Contents(_url, [Timeout =  #duration(0,0,0,2000), Headers=[#"Authorization" = ""]]),
+        objects1 = Json.Document(_response),
+        objects2 = Table.FromRecords(objects1[GET_STATS_LIST][DATALIST_INF][LIST_INF]),
+        objects3 = Table.ExpandRecordColumn(objects2, "STAT_NAME", {"@code", "$"}, {"STATID_","STATNAME_"}),
+        objects4 = Table.ExpandRecordColumn(objects3, "GOV_ORG", {"$"}, {"GOVORG_"}),
+        objects5 = Table.AddColumn(objects4, "Name", each [STATNAME_] & " - " & [GOVORG_] & " (" & [STATID_] & ")"),
+        objects6 = Table.AddColumn(objects5, "Key", each [STATID_]),
+        objects7 = Table.AddColumn(objects6, "ItemKind", each "Folder"),
+        objects8 = Table.AddColumn(objects7, "Data",  each CreateNavTableLevel1(credentials, [STATID_], _lang)),
+        objects9 = Table.AddColumn(objects8, "ItemName",  each "Folder"),
+        objects10 = Table.AddColumn(objects9, "IsLeaf",  each false),
+        objects11 = Table.SelectColumns(objects10, {"Name", "Key", "Data", "ItemKind", "ItemName", "IsLeaf"}),
+        NavTable = Table.ToNavigationTable(objects11, {"Key"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
+    in
+        NavTable;
+
+
+eStatGoJpConnectorType = type function (
+    optional searchKind as (type text meta [
         Documentation.FieldCaption = Extension.LoadString("Type.searchKind.Documentation.FieldCaption"),
         Documentation.FieldDescription = Extension.LoadString("Type.searchKind.Documentation.FieldDescription"),
         Documentation.AllowedValues = { "1: 統計情報", "2: 小地域・地域メッシュ", "3: 社会・人口統計体系（都道府県・市区町村のすがた）"}
@@ -20,30 +46,6 @@ eStatGoJpConnectorNavType = type function (
         Documentation.Examples = {}
     ];
 
-eStatGoJpConnectorNavImpl = (searchKind as text, optional lang as text) as table =>
-    let
-        credentials = Extension.CurrentCredential(),
-        apiKey = credentials[Password],
-        _lang = if (lang <> null) then Text.At(lang, 0) else "J",
-        _url = "https://api.e-stat.go.jp/rest/2.1/app/json/getStatsList?appId=" & apiKey & "&statsNameList=Y&searchKind=" & Text.At(searchKind, 0),
-        _response = Web.Contents(_url, [Timeout =  #duration(0,0,0,2000), Headers=[#"Authorization" = ""]]),
-        objects1 = Json.Document(_response),
-        objects2 = Table.FromRecords(objects1[GET_STATS_LIST][DATALIST_INF][LIST_INF]),
-        objects3 = Table.ExpandRecordColumn(objects2, "STAT_NAME", {"@code", "$"}, {"STATID_","STATNAME_"}),
-        objects4 = Table.ExpandRecordColumn(objects3, "GOV_ORG", {"$"}, {"GOVORG_"}),
-        objects5 = Table.AddColumn(objects4, "Name", each [STATNAME_] & " - " & [GOVORG_] & " (" & [STATID_] & ")"),
-        objects6 = Table.AddColumn(objects5, "Key", each [STATID_]),
-        objects7 = Table.AddColumn(objects6, "ItemKind", each "Folder"),
-        objects8 = Table.AddColumn(objects7, "Data",  each CreateNavTableLevel1(Extension.CurrentCredential(), [STATID_], _lang)),
-        objects9 = Table.AddColumn(objects8, "ItemName",  each "Folder"),
-        objects10 = Table.AddColumn(objects9, "IsLeaf",  each false),
-        objects11 = Table.RemoveColumns(objects10, {"@id", "STATID_", "STATNAME_", "GOVORG_", "STATISTICS_NAME_SPEC", "TITLE_SPEC"}),
-        NavTable = Table.ToNavigationTable(objects11, {"Key"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
-    in
-        NavTable;
-
-
-
 // Data Source Kind description
 eStatGoJpConnector = [
     TestConnection = (dataSourcePath) => { "eStatGoJpConnector.Contents", dataSourcePath },
@@ -56,7 +58,8 @@ eStatGoJpConnector = [
     Label = Extension.LoadString("DataSourceLabel")
 ];
 
-// Data Source UI publishing description
+
+//Data Source UI publishing description
 eStatGoJpConnector.Publish = [
     Beta = true,
     Category = "Other",
@@ -88,7 +91,7 @@ CreateNavTableLevel1 = (credentials as any, statId as text, optional lang as tex
         objects8 = Table.AddColumn(objects7, "ItemKind", each "View"),
         objects9 = Table.AddColumn(objects8, "ItemName",  each "View"),
         objects10 = Table.AddColumn(objects9, "IsLeaf",  each false),
-        objects11 = Table.RemoveColumns(objects10, {"SURVEY_DATE"}),
+        objects11 = Table.SelectColumns(objects10, {"Name", "Key", "Data", "ItemKind", "ItemName", "IsLeaf"}),
         NavTable = Table.ToNavigationTable(objects11, {"Key"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         NavTable;
