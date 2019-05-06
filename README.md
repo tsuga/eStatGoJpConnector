@@ -1,5 +1,5 @@
 
-# Microsoft Power BI 政府統計総合窓口(e-Stat.go.jp) APIコネクタ
+# Power BI 政府統計総合窓口(e-Stat.go.jp) APIコネクタ
 本コネクタを使用することで、Power BIから[政府統計総合窓口(e-Stat.go.jp)](https://www.e-stat.go.jp/)に[API機能](https://www.e-stat.go.jp/api/)を利用してアクセスしデータを取得することができます。
 This Data Connector for Power BI enables users to connect to [a Portal Site for Japanese Government Statistics (e-Stat.go.jp)](https://www.e-stat.go.jp/en) via its [API feature](https://www.e-stat.go.jp/en/developer).
 
@@ -19,8 +19,8 @@ This Data Connector for Power BI enables users to connect to [a Portal Site for 
 
 補足: 本コネクタは未認証であるため、セキュリティレベルを下げる必要があります。
 
-![Step 4](/tsuga/eStatGoJpConnector/raw/master/blobs/setting-1.png)
-![Step 6](/tsuga/eStatGoJpConnector/raw/master/blobs/setting-2.png)
+![Step 4](https://raw.githubusercontent.com/tsuga/eStatGoJpConnector/master/blobs/setting-1.png)
+![Step 6](https://raw.githubusercontent.com/tsuga/eStatGoJpConnector/master/blobs/setting-2.png)
 
 1.  Download the latest extension `eStatGoJpConnector.mez` from [the release page](https://github.com/tsuga/eStatGoJpConnector/releases/download/v0.1.0/eStatGoJpConnector.mez).
 2. Copy the extension file into the  `[Documents]\Power BI Desktop\Custom Connectors`  directory
