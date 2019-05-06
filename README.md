@@ -19,9 +19,6 @@ This Data Connector for Power BI enables users to connect to [a Portal Site for 
 
 補足: 本コネクタは未認証であるため、セキュリティレベルを下げる必要があります。
 
-![Step 4](https://raw.githubusercontent.com/tsuga/eStatGoJpConnector/master/blobs/setting-1.png)
-![Step 6](https://raw.githubusercontent.com/tsuga/eStatGoJpConnector/master/blobs/setting-2.png)
-
 1.  Download the latest extension `eStatGoJpConnector.mez` from [the release page](https://github.com/tsuga/eStatGoJpConnector/releases/download/v0.1.0/eStatGoJpConnector.mez).
 2. Copy the extension file into the  `[Documents]\Power BI Desktop\Custom Connectors`  directory
 3.  Open Power BI Desktop
